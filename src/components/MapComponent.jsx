@@ -70,18 +70,9 @@ const MapComponent = () => {
     }, 5000);
     if (!mapRef.current) return;
 
-    const dangerZone = {
-      lat: 36.98009818266554,
-      lng: 30.488269184292076,
-      radius: 200,
-    };
 
-    L.circle([dangerZone.lat, dangerZone.lng], {
-      color: "red",
-      fillColor: "#f03",
-      fillOpacity: 0.5,
-      radius: dangerZone.radius,
-    }).addTo(mapRef.current);
+
+
 
     const animals = [
       {
@@ -501,12 +492,24 @@ const MapComponent = () => {
     });
 
     const updatedAnimals = data[timestamp]
-      .map((item) => {
+      .map((item,index) => {
         const animalType = item.animal.toLowerCase();
         const animalData = animals.find((animal) =>
           animal.type.toLowerCase().includes(animalType)
         );
-
+        if(index === 1){
+          const dangerZone = {
+            lat: 36.98009818266554,
+            lng: 30.488269184292076,
+            radius: 200,
+          };
+          L.circle([dangerZone.lat, dangerZone.lng], {
+            color: "red",
+            fillColor: "#f03",
+            fillOpacity: 0.5,
+            radius: dangerZone.radius,
+          }).addTo(mapRef.current);
+        }
         if (animalData) {
           return {
             ...animalData,
