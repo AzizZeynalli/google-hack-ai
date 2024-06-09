@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./MapComponent.css";
@@ -8,6 +8,15 @@ import tortoise from "../assets/tortoise.png";
 import lynx from "../assets/lynx.png";
 import goat from "../assets/goat.png";
 import boar from "../assets/boar.png";
+import AnimalInfo from "./AnimalInfo";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+} from "@chakra-ui/react";
 
 const addLegend = (map) => {
   const legend = L.control({ position: "bottomright" });
@@ -24,31 +33,42 @@ const addLegend = (map) => {
 const getMarkerIcon = (animal) => {
   return L.icon({
     iconUrl: animal.image,
-    iconSize: [50, 35], // size of the icon
-    iconAnchor: [25, 17.5], // point of the icon which will correspond to marker's location
-    popupAnchor: [0, -17.5], // point from which the popup should open relative to the iconAnchor
+    iconSize: [50, 35],
+    iconAnchor: [25, 17.5],
+    popupAnchor: [0, -17.5],
   });
 };
 
 const MapComponent = () => {
   const mapRef = useRef(null);
-
-  const [timestamp, setTimestamp] = useState(0)
+  const [selectedAnimal, setSelectedAnimal] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [timestamp, setTimestamp] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimestamp(prevTimestamp => prevTimestamp + 1);
-    }, 5000); 
-    if (mapRef.current) return;
+      setTimestamp((prevTimestamp) => (prevTimestamp + 1) % 6);
+    }, 5000);
 
-    mapRef.current = L.map("map").setView([36.9804, 30.4623], 12);
+    if (!mapRef.current) {
+      mapRef.current = L.map("map").setView([36.9804, 30.4623], 12);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(mapRef.current);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(mapRef.current);
 
-    addLegend(mapRef.current);
+      addLegend(mapRef.current);
+    }
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimestamp((prevTimestamp) => prevTimestamp % 6);
+    }, 5000);
+    if (!mapRef.current) return;
 
     const dangerZone = {
       lat: 36.98009818266554,
@@ -109,7 +129,7 @@ const MapComponent = () => {
         lng: 30.498275441281162,
         prediction: "Low",
         anomaly: 7.21,
-        type: "Wild boar (Sus scrofa)",
+        type: "Wild boar pig (Sus scrofa)",
         image: boar,
       },
     ];
@@ -289,8 +309,196 @@ const MapComponent = () => {
           coordinates: [36.953074242594155, 30.529142752845736],
         },
       ],
+      3: [
+        {
+          animal: "GOAT",
+          coordinates: [37.007839504764064, 30.47461962347341],
+        },
+        { animal: "BEAR", coordinates: [37.00670125893403, 30.48649720958996] },
+        {
+          animal: "LYNX",
+          coordinates: [36.99510268037309, 30.508639458322534],
+        },
+        {
+          animal: "LYNX",
+          coordinates: [36.98831173302106, 30.516974735739787],
+        },
+        {
+          animal: "TORTOISE",
+          coordinates: [36.982778307136506, 30.44427784635965],
+        },
+        { animal: "FOX", coordinates: [36.97544974357759, 30.460053672278367] },
+        { animal: "BEAR", coordinates: [36.9823911073136, 30.48053381854486] },
+        {
+          animal: "GOAT",
+          coordinates: [36.960924298053726, 30.496743845568336],
+        },
+        {
+          animal: "TORTOISE",
+          coordinates: [36.96424090667984, 30.442283835278825],
+        },
+        {
+          animal: "LYNX",
+          coordinates: [36.945448700762476, 30.485355745137813],
+        },
+        {
+          animal: "TORTOISE",
+          coordinates: [36.972416942067426, 30.535575362019863],
+        },
+        {
+          animal: "BEAR",
+          coordinates: [36.97277691248178, 30.513010914524358],
+        },
+        {
+          animal: "BEAR",
+          coordinates: [36.94845928530606, 30.507199573533402],
+        },
+        { animal: "PIG", coordinates: [36.98967402497776, 30.528144568690863] },
+        { animal: "GOAT", coordinates: [37.01815117339482, 30.49955651188231] },
+        {
+          animal: "BEAR",
+          coordinates: [37.01623188896275, 30.458957372512362],
+        },
+        {
+          animal: "BEAR",
+          coordinates: [36.945994859739876, 30.441515738937305],
+        },
+        { animal: "FOX", coordinates: [36.93980131905428, 30.4715749977935] },
+        { animal: "PIG", coordinates: [36.94192058259152, 30.49732790291693] },
+        {
+          animal: "FOX",
+          coordinates: [36.962211912994476, 30.522803674947557],
+        },
+      ],
+      4: [
+        {
+          animal: "GOAT",
+          coordinates: [37.003101031256165, 30.471127755908913],
+        },
+        { animal: "BEAR", coordinates: [37.0052944280905, 30.48417029654973] },
+        {
+          animal: "LYNX",
+          coordinates: [37.00913272027146, 30.515746973890657],
+        },
+        {
+          animal: "LYNX",
+          coordinates: [36.989939321354086, 30.501331534235007],
+        },
+        {
+          animal: "TORTOISE",
+          coordinates: [36.98280911070616, 30.444356225119847],
+        },
+        { animal: "FOX", coordinates: [36.966352227940526, 30.46220391231256] },
+        {
+          animal: "BEAR",
+          coordinates: [36.98335761217526, 30.477992250983004],
+        },
+        {
+          animal: "GOAT",
+          coordinates: [36.966352227940526, 30.49446703916088],
+        },
+        {
+          animal: "TORTOISE",
+          coordinates: [36.96415770803828, 30.442296876597624],
+        },
+        {
+          animal: "LYNX",
+          coordinates: [36.950440525507126, 30.470441306401483],
+        },
+        {
+          animal: "TORTOISE",
+          coordinates: [36.97238683148438, 30.535654009605597],
+        },
+        {
+          animal: "BEAR",
+          coordinates: [36.97512967493797, 30.514374074875825],
+        },
+        {
+          animal: "BEAR",
+          coordinates: [36.95098926024785, 30.508196029309136],
+        },
+        { animal: "PIG", coordinates: [36.99103621751952, 30.528103065024037] },
+        {
+          animal: "GOAT",
+          coordinates: [37.023935745931624, 30.500645084727612],
+        },
+        {
+          animal: "BEAR",
+          coordinates: [37.01351910258053, 30.458771664775504],
+        },
+        {
+          animal: "BEAR",
+          coordinates: [36.946599271636295, 30.43886462906056],
+        },
+        { animal: "FOX", coordinates: [36.93397664519062, 30.46426326083479] },
+        { animal: "PIG", coordinates: [36.940562624214465, 30.49721283719055] },
+        { animal: "FOX", coordinates: [36.96744946416934, 30.51506052438322] },
+      ],
+      5: [
+        {
+          animal: "GOAT",
+          coordinates: [37.03278876971596, 30.465226401082948],
+        },
+        {
+          animal: "BEAR",
+          coordinates: [37.036077555982025, 30.481024987835692],
+        },
+        {
+          animal: "LYNX",
+          coordinates: [37.02182512020039, 30.531855223474857],
+        },
+        { animal: "LYNX", coordinates: [37.00263492606702, 30.522238692408] },
+        {
+          animal: "TORTOISE",
+          coordinates: [36.996054315529506, 30.421952011282023],
+        },
+        { animal: "FOX", coordinates: [36.97521195850507, 30.43568991280615] },
+        {
+          animal: "BEAR",
+          coordinates: [36.999893074223124, 30.449427814330246],
+        },
+        {
+          animal: "GOAT",
+          coordinates: [36.959850778632976, 30.52292558748422],
+        },
+        {
+          animal: "TORTOISE",
+          coordinates: [36.96369136420023, 30.41027479498655],
+        },
+        {
+          animal: "LYNX",
+          coordinates: [36.93515667474226, 30.443245758644395],
+        },
+        {
+          animal: "TORTOISE",
+          coordinates: [36.976309067021845, 30.556583446218237],
+        },
+        { animal: "BEAR", coordinates: [36.98618233190832, 30.5380372791607] },
+        { animal: "BEAR", coordinates: [36.94338893211519, 30.522238692408] },
+        { animal: "PIG", coordinates: [37.00702168334702, 30.54834070530378] },
+        {
+          animal: "GOAT",
+          coordinates: [37.044846956335654, 30.50850079088391],
+        },
+        {
+          animal: "BEAR",
+          coordinates: [37.02456618093351, 30.426073381739258],
+        },
+        { animal: "BEAR", coordinates: [36.95162030010336, 30.41508306052] },
+        {
+          animal: "FOX",
+          coordinates: [36.931863522781875, 30.483085673064306],
+        },
+        { animal: "PIG", coordinates: [36.93351011654799, 30.50781389580769] },
+        { animal: "FOX", coordinates: [36.96424000346695, 30.540784859465543] },
+      ],
     };
 
+    mapRef.current.eachLayer((layer) => {
+      if (layer instanceof L.Marker || layer instanceof L.CircleMarker) {
+        mapRef.current.removeLayer(layer);
+      }
+    });
 
     const updatedAnimals = data[timestamp]
       .map((item) => {
@@ -311,38 +519,59 @@ const MapComponent = () => {
       })
       .filter(Boolean);
 
-    const markers = updatedAnimals.map((animal) => {
-      const markerIcon = getMarkerIcon(animal);
-      const marker = L.marker([animal.lat, animal.lng], {
-        icon: markerIcon,
+      const markers = updatedAnimals.map((animal) => {
+        const markerIcon = getMarkerIcon(animal);
+        const marker = L.marker([animal.lat, animal.lng], {
+          icon: markerIcon,
+        });
+        marker.bindPopup(`Animal: ${animal.type} , Value: ${animal.anomaly}%`);
+        marker.on("click", () => handleMarkerClick(animal));
+        return marker;
       });
-      marker.bindPopup(`Animal: ${animal.type} , Value: ${animal.anomaly}%`);
-      return marker;
-    });
 
-    const markerGroup = L.layerGroup(markers).addTo(mapRef.current);
+    const markerGroup = L.layerGroup(markers);
 
-    mapRef.current.on("zoomend", function () {
-      if (mapRef.current.getZoom() < 12) {
-        if (mapRef.current.hasLayer(markerGroup)) {
-          mapRef.current.removeLayer(markerGroup);
-        }
-      } else {
-        if (!mapRef.current.hasLayer(markerGroup)) {
-          markerGroup.addTo(mapRef.current);
-        }
-      }
-    });
+    markerGroup.addTo(mapRef.current);
 
-    return () => clearInterval(interval);
-  }, []);
+    // const oldMarkers = data[(timestamp + 2) % 3].map((item) => {
+    //   const marker = L.circleMarker([item.coordinates[0], item.coordinates[1]], {
+    //     color: 'blue',
+    //     radius: 3,
+    //   });
+    //   return marker;
+    // });
+
+    // const oldMarkerGroup = L.layerGroup(oldMarkers);
+    // oldMarkerGroup.addTo(mapRef.current);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [timestamp]);
+
+  const handleMarkerClick = (animal) => {
+    setSelectedAnimal(animal.type);
+    setIsModalOpen(true);
+  };
+
 
   return (
     <div style={{ width: "50%" }}>
       <div
         id="map"
-        style={{ height: "580px", width: "85", borderRadius: "25px" }}
+        style={{ height: "580px", width: "85%", borderRadius: "25px" }}
       />
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Animal Information</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            {selectedAnimal && <AnimalInfo targetAnimal={selectedAnimal} />}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
